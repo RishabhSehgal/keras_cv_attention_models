@@ -1,0 +1,8 @@
+checkpoints/
+build/
+json
+environment_v2.yml
+environment_v3.yml
+environment_v4.yml
+*.tflite
+

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import json
 import tensorflow as tf
@@ -33,6 +32,8 @@ def progressive_train_parse_arguments(argv):
         parse_arguments(argv)
     progressive_args, train_argv = parser.parse_known_args(argv)
     train_args = parse_arguments(train_argv)
+    print("Type after parse_arguments", type(train_args.additional_model_kwargs))
+
     return progressive_args, train_args
 
 
@@ -40,6 +41,8 @@ if __name__ == "__main__":
     import sys
 
     progressive_args, train_args = progressive_train_parse_arguments(sys.argv[1:])
+    print("Type after parse_arguments in main", type(train_args.additional_model_kwargs))
+
     print(">>>> Progressive args:", progressive_args)
 
     initial_epoch = train_args.initial_epoch
@@ -65,7 +68,9 @@ if __name__ == "__main__":
                 additional_model_kwargs.update({"dropout": dropout})
             if drop_connect_rate is not None:
                 additional_model_kwargs.update({"drop_connect_rate": drop_connect_rate})
-            train_args.additional_model_kwargs = json.dumps(additional_model_kwargs)
+
+            train_args.additional_model_kwargs = json.loads(train_args.additional_model_kwargs) if train_args.additional_model_kwargs else {}    
+            #train_args.additional_model_kwargs = json.dumps(additional_model_kwargs)
 
         print("")
         cur_stage = "[Stage {}/{}]".format(stage + 1, total_stages)
@@ -74,6 +79,8 @@ if __name__ == "__main__":
                 cur_stage, train_args.epochs, train_args.initial_epoch, train_args.batch_size, train_args.input_shape, train_args.magnitude, dropout
             )
         )
+        print("Type in main", type(train_args.additional_model_kwargs))
+        #print("Type of **", type(**train_args.additional_model_kwargs))
         model, latest_save, _ = run_training_by_args(train_args)
 
         train_args.initial_epoch = progressive_epochs[stage]

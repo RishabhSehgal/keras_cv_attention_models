@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 import os
 import json
+import tensorflow as tf
 from keras_cv_attention_models.imagenet import (
     compile_model,
     init_global_strategy,
@@ -90,6 +90,7 @@ def parse_arguments(argv):
 
     # args.additional_model_kwargs = {"drop_connect_rate": 0.05}
     args.additional_model_kwargs = json.loads(args.additional_model_kwargs) if args.additional_model_kwargs else {}
+    
 
     lr_decay_steps = args.lr_decay_steps.strip().split(",")
     if len(lr_decay_steps) > 1:
@@ -139,12 +140,22 @@ def run_training_by_args(args):
         num_layers=args.num_layers,
     )
 
+    #Since we're derived our from dataset object from a generator we won't be able to use len() function to know the number of samples in our dataset. We can use cardinality to get the number of samples in our dataset. It's because in our case after the conversion the length is unknown and infinite.tf.data.experimental.cardinality --> returns cardinality of the dataset
+
+# We can explicitly enter our number of samples and even better we can use the len() function now on our dataset using, tf.data.experimental.assert_cardinality() --> Asserts the cardinality of the dataset. Now will apply this to our dataset.
+
+# Using assert_cardinality to add the number of samples (input)
+    #train_dataset = train_dataset.apply(tf.data.experimental.assert_cardinality(40000))
+    #test_dataset = test_dataset.apply(tf.data.experimental.assert_cardinality(4000))
+
     lr_base = args.lr_base_512 * batch_size / 512
     warmup_steps, cooldown_steps, t_mul, m_mul = args.lr_warmup_steps, args.lr_cooldown_steps, args.lr_t_mul, args.lr_m_mul  # Save line-width
     lr_scheduler, lr_total_epochs = init_lr_scheduler(
         lr_base, args.lr_decay_steps, args.lr_min, args.lr_decay_on_batch, args.lr_warmup, warmup_steps, cooldown_steps, t_mul, m_mul
     )
     epochs = args.epochs if args.epochs != -1 else lr_total_epochs
+    print("Type inside run_training_by_args", type(args.additional_model_kwargs))
+    #print("Type of **", type(**args.additional_model_kwargs))
 
     with strategy.scope():
         model = init_model(args.model, input_shape, num_classes, args.pretrained, args.restore_path, **args.additional_model_kwargs)

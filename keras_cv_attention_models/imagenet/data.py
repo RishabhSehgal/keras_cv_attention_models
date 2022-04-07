@@ -257,7 +257,7 @@ def init_dataset(
     num_layers=2,
     **augment_kwargs,  # Too many...
 ):
-    # print(">>>> Dataset args:", locals())
+    print(">i>>> Dataset args:", locals())
     try_gcs = True if len(tf.config.list_logical_devices("TPU")) > 0 else False
     dataset, info = tfds.load(data_name, with_info=True, try_gcs=try_gcs)
     num_classes = info.features["label"].num_classes
@@ -279,6 +279,7 @@ def init_dataset(
         **augment_kwargs,
     )
     train_dataset = dataset["train"].shuffle(buffer_size).map(lambda xx: train_process(xx), num_parallel_calls=AUTOTUNE).batch(batch_size)
+    #print("Length of train_dataset", len(train_dataset))
 
     mean, std = init_mean_std_by_rescale_mode(rescale_mode)
     # rescaling = lambda xx: (tf.clip_by_value(xx, 0, 255) - mean) / std

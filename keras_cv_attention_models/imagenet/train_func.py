@@ -145,7 +145,7 @@ def train(compiled_model, epochs, train_dataset, test_dataset=None, initial_epoc
     if compiled_model.compiled_loss is None:
         print(">>>> Error: Model NOT compiled.")
         return None
-
+    #steps_per_epoch = 105
     steps_per_epoch = len(train_dataset)
     if hasattr(lr_scheduler, "steps_per_epoch") and lr_scheduler.steps_per_epoch == -1:
         lr_scheduler.build(steps_per_epoch)
