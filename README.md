@@ -48,6 +48,19 @@
 # [Roadmap and todo list](https://github.com/leondgarse/keras_cv_attention_models/wiki/Roadmap)
 ***
 
+# Based on changes and tuned models created by Rishabh: 
+  | Model/Checkpoint | Central Crop | TFLITE | Quantized | Surgery | Top1 Acc | Top5 Acc |
+  | ---------------- | ------------ | ------ | --------- | ------- | -------- | -------- |
+  | ./checkpoints/effv2b0_cifar10_224_progressive_epoch_35_val_acc_0.9528.h5 | 0.875  | NO | NO | NO | 0.9524 | 0.9987 |
+  | ./efficientnet_v2-b0_no_quant.tflite | 0.875  | YES | NO | Conv2dtoSplit | 0.9524 | 0.9987 |
+  | ./efficientnet_v2-b0_uint8.tflite    | 0.875  | YES | 8b uint input/output and 8bit int weights | Conv2dtoSplit and Convert GeLU | 0.8697 | 0.992 |
+  | ./efficientnet_v2-b0_int8.tflite    | 0.875  | YES | 8b int input/output and 8bit int weights | Both | 0.1 | 0.4999 | * Some problem
+  | ./efficientnet_v2-b0_nosurg_uint8.tflite | 0.875  | YES | 8b uint input/output and 8bit int weights | Conv2dtoSplit | 0.8693 | 0.991 |
+  | ./efficientnet_v2-b0_splconv2d_uint8.tflite | 0.875  | YES | 8b uint input/output and 8bit int weights | Conv2dtoSplit | 0.8758 | 0.9915 |
+  | ./efficientnet_v2-b0_splconv2d_dynquant_floatfallback.tflite | 0.875  | YES | 8 bit int weight and 8b int activations with float fallback for fcn | Conv2dtoSplit | 0.914 | 0.9951 |
+  
+***
+
 # General Usage
 ## Basic
   - **Currently recommended TF version is `tensorflow==2.8.0`. Expecially for training or TFLite conversion**.
